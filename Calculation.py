@@ -22,4 +22,8 @@ def dataget():
 #    for ct1 in range(rowct):
 #        print(cell[ct1])
     return cell
+def syntaxget():
+    syntax = input("式を入力してください")
+    return syntax
+syntax = syntaxget()
 data = dataget()
