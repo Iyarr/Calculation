@@ -24,11 +24,15 @@ def dataget():
     return cell
 #   逆ポーランド記法への変換
 def porandmake(syntax):
+    ct1 = 1
+    ct2 = 1
+
 
     return syntax
 #   式の入力
 def syntaxget():
     syntax = input("式を入力してください")
+    syntax.strip()
     syntax = porandmake(syntax)
     return syntax
 
