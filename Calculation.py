@@ -22,8 +22,15 @@ def dataget():
 #    for ct1 in range(rowct):
 #        print(cell[ct1])
     return cell
+#   逆ポーランド記法への変換
+def porandmake(syntax):
+
+    return syntax
+#   式の入力
 def syntaxget():
     syntax = input("式を入力してください")
+    syntax = porandmake(syntax)
     return syntax
+
 syntax = syntaxget()
 data = dataget()
