@@ -26,7 +26,7 @@ def dataget():
 def porandmake(syntax):
     ct1 = 1
     ct2 = 1
-
+    
 
     return syntax
 #   式の入力
