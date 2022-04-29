@@ -23,17 +23,55 @@ def dataget():
 #        print(cell[ct1])
     return cell
 #   逆ポーランド記法への変換
-def porandmake(syntax):
-    ct1 = 1
-    ct2 = 1
+def porandmake(syntax,ct):
+    deep = 0
+    st = ct
+    while( syntax[ct] == ')' and deep == 0 ):
+        if ct >= syntax.strlen():
+            break
+
+        if syntax[ct] == '(':
+            deep = deep + 1
+
+        elif syntax[ct] == ')':
+            deep = deep - 1
+
+        elif syntax[ct] == '+':
+            if( deep == 0 ):
+                calculate = ct
+        
+        ct = ct+1
     
 
     return syntax
 #   式の入力
 def syntaxget():
     syntax = input("式を入力してください")
-    syntax.strip()
+    syntax = syntax.replace(' ','')
+    syntax = syntax.replace('*', '')
+    mount = syntax.count('(')
+    ctmax = syntax.strlen()
+    deep = 0
+    while( 0 < mount ):
+        ct = 0
+        while( ct < ctmax ):
+            if syntax[ct] == '(':
+                deep = deep + 1
+
+            elif syntax[ct] == ')':
+                deep = deep - 1
+            
+            else:
+                if( mount == deep ):
+                    syntax = porandmake(syntax,ct)
+
+        mount = mount - 1
+
+
+        
     syntax = porandmake(syntax)
+    syntax = syntax.replace('(', '')
+    syntax = syntax.replace(')', '')
     return syntax
 
 syntax = syntaxget()
