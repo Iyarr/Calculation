@@ -1,4 +1,5 @@
 import math
+import numpy as np
 def dataget():
     rowct=0
     columnct = 0
@@ -22,14 +23,12 @@ def dataget():
 #    for ct1 in range(rowct):
 #        print(cell[ct1])
     return cell
-#   逆ポーランド記法への変換
-def porandmake(syntax,ct):
-    deep = 0
-    st = ct
-    while( syntax[ct] == ')' and deep == 0 ):
-        if ct >= syntax.strlen():
-            break
-
+def separate(syntax):
+    len = syntax.strlen()
+    entity = []*3
+    sign = 0
+    ct = 0
+    while(ct < len):
         if syntax[ct] == '(':
             deep = deep + 1
 
@@ -37,10 +36,38 @@ def porandmake(syntax,ct):
             deep = deep - 1
 
         elif syntax[ct] == '+':
+            syntax[ct] = ' '
             if( deep == 0 ):
-                calculate = ct
-        
-        ct = ct+1
+                entity[0] = '+'
+                entity[1] = syntax.split(' ',0)
+                entity[2] = syntax.split(' ',1)
+        elif syntax[ct] == '-':
+            syntax[ct] = ' '
+            if( deep == 0 ):
+                entity[0] = '-'
+                entity[1] = syntax.split(' ',0)
+                entity[2] = syntax.split(' ',1)
+
+    return entity
+def divideword(syntax):
+    len = syntax.strlen()
+
+
+
+    return syntax
+
+#   逆ポーランド記法への変換
+def porandmake(syntax):
+    deep = 0
+    ct = 0
+    len = syntax.strlen()
+    entity = separate(syntax)
+    tree = []*3
+
+    tree[0] = entity[0]
+
+    tree[1] = porandmake(entity[1])
+    tree[2] = porandmake(entity[2])
     
 
     return syntax
@@ -49,29 +76,9 @@ def syntaxget():
     syntax = input("式を入力してください")
     syntax = syntax.replace(' ','')
     syntax = syntax.replace('*', '')
-    mount = syntax.count('(')
-    ctmax = syntax.strlen()
-    deep = 0
-    while( 0 < mount ):
-        ct = 0
-        while( ct < ctmax ):
-            if syntax[ct] == '(':
-                deep = deep + 1
+    len = syntax.strlen()
+    syntax = porandmake(syntax,len)
 
-            elif syntax[ct] == ')':
-                deep = deep - 1
-            
-            else:
-                if( mount == deep ):
-                    syntax = porandmake(syntax,ct)
-
-        mount = mount - 1
-
-
-        
-    syntax = porandmake(syntax)
-    syntax = syntax.replace('(', '')
-    syntax = syntax.replace(')', '')
     return syntax
 
 syntax = syntaxget()
