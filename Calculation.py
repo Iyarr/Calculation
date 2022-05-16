@@ -12,9 +12,9 @@ def dataget():
             break
         queue.append(row)
         rowct = rowct + 1
-    cell = ["NULL"]*rowct*columnct
+    cell = []*rowct*columnct
     for ct1 in range(rowct):
-        cell[ct1] = ["NULL"] * columnct
+        cell[ct1] = [] * columnct
         ct2 = 0
         for values in queue[ct1].split(" "):
             cell[ct1][ct2] = values
@@ -23,6 +23,7 @@ def dataget():
 #    for ct1 in range(rowct):
 #        print(cell[ct1])
     return cell
+
 def separate(syntax):
     len = syntax.strlen()
     entity = []*3
@@ -35,22 +36,49 @@ def separate(syntax):
         elif syntax[ct] == ')':
             deep = deep - 1
 
-        elif syntax[ct] == '+':
-            syntax[ct] = ' '
-            if( deep == 0 ):
-                entity[0] = '+'
-                entity[1] = syntax.split(' ',0)
-                entity[2] = syntax.split(' ',1)
-        elif syntax[ct] == '-':
-            syntax[ct] = ' '
-            if( deep == 0 ):
-                entity[0] = '-'
-                entity[1] = syntax.split(' ',0)
-                entity[2] = syntax.split(' ',1)
+        elif deep == 0:
+            if syntax[ct] == '+':
+                syntax[ct] = ' '
+                return np.array('+',syntax.split(' ',0),syntax.split(' ',1))
+            elif syntax[ct] == '-':
+                syntax[ct] = ' '
+                return np.array('-',syntax.split(' ',0),syntax.split(' ',1))
 
-    return entity
-def divideword(syntax):
-    len = syntax.strlen()
+    return intergral(syntax)
+    
+def trip(syntax):
+    ct = 0
+    for word in syntax :
+        last = word
+        if word == '(':
+            deep = deep + 1
+
+        elif word == ')':
+            deep = deep - 1
+            
+        if deep == 0:
+            if ct < word.strlen():
+                return syntax
+            else:
+                return syntax[1:word.strlen()-1]
+        
+        ct=ct+1
+
+    return syntax
+
+# insert *
+def intergral(syntax):
+    ct = 0
+    for word in syntax:
+        if word == '(':
+            deep = deep + 1
+
+        elif word == ')':
+            deep = deep - 1
+            ct = ct + 1
+        else:
+            if deep == 0:
+                ct = ct + 1
 
 
 
@@ -58,6 +86,7 @@ def divideword(syntax):
 
 #   逆ポーランド記法への変換
 def porandmake(syntax):
+    syntax = trip(syntax)
     deep = 0
     ct = 0
     len = syntax.strlen()
@@ -68,7 +97,8 @@ def porandmake(syntax):
 
     tree[1] = porandmake(entity[1])
     tree[2] = porandmake(entity[2])
-    
+
+    syntax = tree[1]+tree[2]+tree[0]
 
     return syntax
 #   式の入力
@@ -77,7 +107,7 @@ def syntaxget():
     syntax = syntax.replace(' ','')
     syntax = syntax.replace('*', '')
     len = syntax.strlen()
-    syntax = porandmake(syntax,len)
+    syntax = porandmake(syntax)
 
     return syntax
 
