@@ -1,115 +1,106 @@
 import math
 import numpy as np
-def dataget():
-    rowct=0
-    columnct = 0
-    queue = []
-    while(1):
-        row = input("対応する行列を入力してください")
-        columnct = max(columnct,row.count(" ")+1)
-        
-        if( row == ""):
-            break
-        queue.append(row)
-        rowct = rowct + 1
-    cell = []*rowct*columnct
-    for ct1 in range(rowct):
-        cell[ct1] = [] * columnct
-        ct2 = 0
-        for values in queue[ct1].split(" "):
-            cell[ct1][ct2] = values
-            ct2 = ct2 + 1
 
-#    for ct1 in range(rowct):
-#        print(cell[ct1])
-    return cell
+class mathod:
+    def __init__(self,myname,syntax):
+        self.name = myname
+        self.values = self.porandmake(self,syntax)
+        pass
+    #   逆ポーランド記法への変換
+    def porandmake(self,syntax):
+        syntax = self.__trip(syntax)
+        length = len(syntax)
+        deep = 0
+        ct = 0
+        entity = self.__separate(syntax)
+        tree = []*3
 
-def separate(syntax):
-    len = syntax.strlen()
-    entity = []*3
-    sign = 0
-    ct = 0
-    while(ct < len):
-        if syntax[ct] == '(':
-            deep = deep + 1
+        tree[0] = entity[0]
 
-        elif syntax[ct] == ')':
-            deep = deep - 1
+        tree[1] = self.porandmake(entity[1])
+        tree[2] = self.porandmake(entity[2])
 
-        elif deep == 0:
-            if syntax[ct] == '+':
-                syntax[ct] = ' '
-                return np.array('+',syntax.split(' ',0),syntax.split(' ',1))
-            elif syntax[ct] == '-':
-                syntax[ct] = ' '
-                return np.array('-',syntax.split(' ',0),syntax.split(' ',1))
+        syntax = tree[1]+tree[2]+tree[0]
 
-    return intergral(syntax)
-    
-def trip(syntax):
-    ct = 0
-    for word in syntax :
-        last = word
-        if word == '(':
-            deep = deep + 1
+        return syntax
 
-        elif word == ')':
-            deep = deep - 1
-            
-        if deep == 0:
-            if ct < word.strlen():
-                return syntax
-            else:
-                return syntax[1:word.strlen()-1]
-        
-        ct=ct+1
+    def __trip(self,syntax):
+        ct = 0
+        for word in syntax :
+            last = word
+            if word == '(':
+                deep = deep + 1
 
-    return syntax
-
-# insert *
-def intergral(syntax):
-    ct = 0
-    for word in syntax:
-        if word == '(':
-            deep = deep + 1
-
-        elif word == ')':
-            deep = deep - 1
-            ct = ct + 1
-        else:
+            elif word == ')':
+                deep = deep - 1
+                
             if deep == 0:
-                ct = ct + 1
+                if ct < len(syntax):
+                    return syntax
+                else:
+                    return syntax[1:len(syntax)-1]
+            
+            ct=ct+1
 
+        return syntax
 
+    def __separate(self,syntax):
+        length = len(syntax)
+        entity = []*3
+        sign = 0
+        ct = 0
+        while(ct < length):
+            if syntax[ct] == '(':
+                deep = deep + 1
 
-    return syntax
+            elif syntax[ct] == ')':
+                deep = deep - 1
 
-#   逆ポーランド記法への変換
-def porandmake(syntax):
-    syntax = trip(syntax)
-    deep = 0
-    ct = 0
-    len = syntax.strlen()
-    entity = separate(syntax)
-    tree = []*3
+            elif deep == 0:
+                if syntax[ct] == '+':
+                    syntax[ct] = ' '
+                    return np.array('+',syntax.split(' ',0),syntax.split(' ',1))
+                elif syntax[ct] == '-':
+                    syntax[ct] = ' '
+                    return np.array('-',syntax.split(' ',0),syntax.split(' ',1))
 
-    tree[0] = entity[0]
+        return self.__intergral(self,syntax)
+        
+    # insert *
+    def __intergral(self,syntax):
+        length = len(syntax)
+        ctin = 0
+        ctout = 0
+        while ctin < length:
+            ctout = ctout + 1
+            if syntax[ctin] == '(':
+                init = ctin
+                deep = 0
+                while syntax[ctin] !=  ')' | deep != 0:
+                    if syntax[ctin] ==  '(':
+                        deep = deep + 1
 
-    tree[1] = porandmake(entity[1])
-    tree[2] = porandmake(entity[2])
+                    elif syntax[ctin] ==  ')':
+                        deep = deep - 1
 
-    syntax = tree[1]+tree[2]+tree[0]
+                    ctin = ctin + 1
+                syntax = syntax[0:init-1]+self.porandmake(syntax[init:len-1])
+                
+            if ctout >= 2:
+                syntax = syntax[0:ctin] + '*' + syntax[ctin:len-1]
+                ctout = 1
+                ctin = ctin + 1
+                length = length + 1
+            ctin = ctin + 1
 
-    return syntax
-#   式の入力
-def syntaxget():
-    syntax = input("式を入力してください")
-    syntax = syntax.replace(' ','')
-    syntax = syntax.replace('*', '')
-    len = syntax.strlen()
-    syntax = porandmake(syntax)
+        return syntax
 
-    return syntax
+    #   alternative input process
+    def syntaxget(self):
+        syntax = input("式を入力してください")
+        syntax = syntax.replace(' ','')
+        syntax = syntax.replace('*', '')
+        length = len(syntax)
+        syntax = self.porandmake(syntax)
 
-syntax = syntaxget()
-data = dataget()
+        return syntax
