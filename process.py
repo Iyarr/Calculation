@@ -1,4 +1,4 @@
-from dataget import mathod
+from dataget import Input
 
 
 value = mathod.syntaxget()
