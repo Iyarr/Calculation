@@ -34,11 +34,12 @@ def porandmake(syntax):
                 former = porandmake(syntax[0:ct])
                 latter = porandmake(syntax[ct+1:length])
                 sign = 1
-                return former+latter+syntax[ct]
+                return [former,latter,syntax[ct]]
         ct = ct + 1
     #
     ct = 0
     if sign == 0:
+        species = False
         level = 0
         st = 0
         while ct < length:
@@ -52,7 +53,7 @@ def porandmake(syntax):
                     if level == 1:
                         st = ct
                     
-            elif deep == 0:
+            elif deep == 0 :
                 level = level + 1
                 if level == 1:
                     st = ct
@@ -60,9 +61,10 @@ def porandmake(syntax):
             if level == 2:
                 former = porandmake(syntax[0:st+1])
                 latter = porandmake(syntax[st+1:length])
-                return former+latter+'*'
+                return [former,latter,'*']
+                
+            species = syntax[ct].isdigit()
             ct = ct + 1
-
     return syntax
 #   式の入力
 def syntaxget():

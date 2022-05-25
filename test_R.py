@@ -1,6 +1,12 @@
-s = "lgfpoj"
-o = [10]*10
-x = list(s[0])+list(s[1])+list(s[0])
-print(s[0:10])
-print(x)
-print(o)
+
+        
+print("対応する行列を入力してください")
+values = []
+while(1):
+    # comes data from front
+    row = input()
+    if( row == ''):
+        break
+    values.append(row.split(" "))
+for row in values:
+    print(row)
