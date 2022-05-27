@@ -5,31 +5,31 @@ from dataget import Input
 class Queue:
     def __init__(self,word):
         self.name = word
+        print(word)
         self.entity = Input.dataget()
 
 def intensive():
     syntax = Input.syntaxget()
-    array = tracking(syntax)
+    array = tostr(syntax)
+    forign = []
     mark = []
     for word in array:
         if mark.count(word) == 0:
             mark.append(word)
-    print(mark)
+            forign.append(Queue(word))
 
-def tracking(syntax):
-    array = []
-    for ct in range(3):
-        length = len(syntax[ct])
+    for data in forign:
+        print(data.name)
+
+def tostr(syntax):
+    array = ''
+    for cell in syntax:
+        length = len(cell)
         if length == 1 :
-            if str(syntax[ct]).isalpha():
-                array = array.append(syntax[ct])
+            if cell.isalpha():
+                array = array + cell
         elif length > 1:
-            array = tracking(syntax[ct])
-
+            array = array + tostr(cell)
     return array
-
-def test():
-    entity = Queue('a')
-    print(entity.name)
 
 intensive()
