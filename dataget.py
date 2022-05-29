@@ -3,6 +3,7 @@ from calculation import Method
 class Input:
     def dataget():
         values = []
+        print("の内容を入力してください\n")
         while(1):
             # comes data from front
             row = input()

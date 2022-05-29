@@ -1,4 +1,4 @@
-
+from calculation import Method
     #   逆ポーランド記法への変換
 def porandmake(syntax):
     length = len(syntax)

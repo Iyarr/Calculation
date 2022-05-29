@@ -53,15 +53,32 @@ class Method:
                         if level == 1:
                             st = ct
                         
-                elif deep == 0:
-                    level = level + 1
-                    if level == 1:
-                        st = ct
+                elif deep == 0 :
+                    if ct + 1 < length and syntax[ct].isdigit():
+                        if syntax[ct+1].isdigit() == False:
+                            level = level + 1
+                            if level == 1:
+                                st = ct
+                    else :
+                        level = level + 1
+                        if level == 1:
+                            st = ct
+
 
                 if level == 2:
                     former = self.porandmake(self,syntax[0:st+1])
                     latter = self.porandmake(self,syntax[st+1:length])
                     return [former,latter,'*']
                 ct = ct + 1
-
         return syntax
+        
+    def tostr(self,syntax):
+        array = ''
+        for cell in syntax:
+            length = len(cell)
+            if length == 1 :
+                if cell.isalpha():
+                    array = array + cell
+            elif length > 1:
+                array = array + self.tostr(cell)
+        return array
