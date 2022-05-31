@@ -1,13 +1,15 @@
 
 class Method:
-    #   逆ポーランド記法への変換
+    #　逆ポーランド記法への変換
     def porandmake(self,syntax):
         length = len(syntax)
         if length < 2:
             return syntax
-        #
+        
         ct = 0
         deep = 0
+
+        #　不要な括弧の除去
         while ct < length:
             if syntax[ct] == '(':
                 deep = deep + 1
@@ -20,10 +22,11 @@ class Method:
                     length = length - 2
                 break
             ct = ct + 1
-        #
+        
         sign = 0
         deep = 0
         ct = 0
+        #　演算子の検出　＋、ー
         while ct < length:
             if syntax[ct] == '(':
                 deep = deep + 1
@@ -37,11 +40,12 @@ class Method:
                     sign = 1
                     return [former,latter,syntax[ct]]
             ct = ct + 1
-        #
-        ct = 0
+        
+        #　演算子の検出　＊
         if sign == 0:
             level = 0
             st = 0
+            ct = 0
             while ct < length:
                 if syntax[ct] == '(':
                     deep = deep + 1
@@ -65,9 +69,13 @@ class Method:
                             st = ct
 
 
-                if level == 2:
+                if level == 2 :
                     former = self.porandmake(self,syntax[0:st+1])
                     latter = self.porandmake(self,syntax[st+1:length])
+                    return [former,latter,'*']
+                elif syntax[ct] == '*':
+                    former = self.porandmake(self,syntax[0:ct])
+                    latter = self.porandmake(self,syntax[ct+1:length])
                     return [former,latter,'*']
                 ct = ct + 1
         return syntax
@@ -80,5 +88,5 @@ class Method:
                 if cell.isalpha():
                     array = array + cell
             elif length > 1:
-                array = array + self.tostr(cell)
+                array = array + self.tostr(self,cell)
         return array
