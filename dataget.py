@@ -1,19 +1,19 @@
 from calculation import Method
 
 class Input:
-    def dataget():
-        values = []
+    def get_queue():
+        queue = []
         print("の内容を入力してください\n")
         while(1):
             # comes data from front
             row = input()
             if( row == ''):
                 break
-            values.append(row.split(" "))
-        return values
+            queue.append(row.split(" "))
+        return queue
 
-    def syntaxget():
-        syntax = input("式を入力してください\n")
-        syntax = syntax.replace(' ','')
-        syntax = syntax.replace(' ','*')
-        return Method.porandmake(Method,syntax)
+    def get_formula():
+        formula = input("式を入力してください\n")
+        formula = formula.replace(' ','')
+        formula = formula.replace('*','')
+        return Method.convert_formula_to_rpn(Method,formula)

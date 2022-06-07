@@ -6,10 +6,10 @@ class Queue:
     def __init__(self,word):
         self.name = word
         print(word)
-        self.entity = Input.dataget()
+        self.entity = Input.get_formula()
 
 def intensive():
-    syntax = Input.syntaxget()
+    syntax = Input.get_formula()
     array = Method.tostr(syntax)
     forign = []
     shuck = []
