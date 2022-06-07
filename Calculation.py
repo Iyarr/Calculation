@@ -1,24 +1,24 @@
 
 class Method:
     #　逆ポーランド記法への変換
-    def porandmake(self,syntax):
-        length = len(syntax)
+    def convert_formula_to_rpn(self,formula):
+        length = len(formula)
         if length < 2:
-            return syntax
+            return formula
         
         ct = 0
         deep = 0
 
         #　不要な括弧の除去
         while ct < length:
-            if syntax[ct] == '(':
+            if formula[ct] == '(':
                 deep = deep + 1
-            elif syntax[ct] == ')':
+            elif formula[ct] == ')':
                 deep = deep - 1
                 
             if deep == 0:
                 if ct >= length-1:
-                    syntax = syntax[1:length-1]
+                    formula = formula[1:length-1]
                     length = length - 2
                 break
             ct = ct + 1
@@ -28,17 +28,17 @@ class Method:
         ct = 0
         #　演算子の検出　＋、ー
         while ct < length:
-            if syntax[ct] == '(':
+            if formula[ct] == '(':
                 deep = deep + 1
-            elif syntax[ct] == ')':
+            elif formula[ct] == ')':
                 deep = deep - 1
 
             elif deep == 0:
-                if syntax[ct] == '+' or syntax[ct] == '-':
-                    former = self.porandmake(self,syntax[0:ct])
-                    latter = self.porandmake(self,syntax[ct+1:length])
+                if formula[ct] == '+' or formula[ct] == '-':
+                    former = self.porandmake(self,formula[0:ct])
+                    latter = self.porandmake(self,formula[ct+1:length])
                     sign = 1
-                    return [former,latter,syntax[ct]]
+                    return [former,latter,formula[ct]]
             ct = ct + 1
         
         #　演算子の検出　＊
@@ -47,10 +47,10 @@ class Method:
             st = 0
             ct = 0
             while ct < length:
-                if syntax[ct] == '(':
+                if formula[ct] == '(':
                     deep = deep + 1
 
-                elif syntax[ct] == ')':
+                elif formula[ct] == ')':
                     deep = deep - 1
                     if deep == 0:
                         level = level + 1
@@ -58,8 +58,8 @@ class Method:
                             st = ct
                         
                 elif deep == 0 :
-                    if ct + 1 < length and syntax[ct].isdigit():
-                        if syntax[ct+1].isdigit() == False:
+                    if ct + 1 < length and formula[ct].isdigit():
+                        if formula[ct+1].isdigit() == False:
                             level = level + 1
                             if level == 1:
                                 st = ct
@@ -70,23 +70,23 @@ class Method:
 
 
                 if level == 2 :
-                    former = self.porandmake(self,syntax[0:st+1])
-                    latter = self.porandmake(self,syntax[st+1:length])
+                    former = self.convert_formula_to_rpn(self,formula[0:st+1])
+                    latter = self.convert_formula_to_rpn(self,formula[st+1:length])
                     return [former,latter,'*']
-                elif syntax[ct] == '*':
-                    former = self.porandmake(self,syntax[0:ct])
-                    latter = self.porandmake(self,syntax[ct+1:length])
+                elif formula[ct] == '*':
+                    former = self.convert_formula_to_rpn(self,formula[0:ct])
+                    latter = self.convert_formula_to_rpn(self,formula[ct+1:length])
                     return [former,latter,'*']
                 ct = ct + 1
-        return syntax
+        return formula
         
-    def tostr(self,syntax):
+    def tostr(self,list):
         array = ''
-        for cell in syntax:
+        for cell in list:
             length = len(cell)
             if length == 1 :
                 if cell.isalpha():
-                    array = array + cell
+                    return cell
             elif length > 1:
-                array = array + self.tostr(self,cell)
+                return array + self.tostr(self,cell)
         return array
