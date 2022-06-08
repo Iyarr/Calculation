@@ -1,78 +1,73 @@
 from calculation import Method
-    #   逆ポーランド記法への変換
-def porandmake(syntax):
-    length = len(syntax)
+
+#　キーボードからの入力
+def get_expr():
+    return convert_to_rpn(input("式を入力してください\n").replace(' ',''))
+
+#   逆ポーランド記法への変換
+def convert_to_rpn(expr):
+    length = len(expr)
     if length < 2:
-        return syntax
-    #
-    ct = 0
+        return expr
+
+    if find_brackets(expr) == length-1:
+        expr = expr[1:-1]
+    
+    return find_add_sub(expr) or find_mul(expr) or expr
+
+    #　不要な括弧の検出
+def find_brackets(expr):
     deep = 0
-    while ct < length:
-        if syntax[ct] == '(':
-            deep = deep + 1
-        elif syntax[ct] == ')':
-            deep = deep - 1
-            
+    for ct, c in enumerate(expr):
+        if c == '(':
+            deep += 1
+        elif c == ')':
+            deep -= 1
+
         if deep == 0:
-            if ct >= length-1:
-                syntax = syntax[1:length-1]
-                length = length - 2
             break
-        ct = ct + 1
-    #
-    sign = 0
+
+    return ct
+
+    #　演算子の検出　＋、ー
+def find_add_sub(expr):
     deep = 0
-    ct = 0
-    while ct < length:
-        if syntax[ct] == '(':
-            deep = deep + 1
-        elif syntax[ct] == ')':
-            deep = deep - 1
-
+    for ct, c in enumerate(expr):
+        if c == '(':
+           deep += 1
+        elif c == ')':
+                deep += 1
         elif deep == 0:
-            if syntax[ct] == '+' or syntax[ct] == '-':
-                former = porandmake(syntax[0:ct])
-                latter = porandmake(syntax[ct+1:length])
-                sign = 1
-                return [former,latter,syntax[ct]]
-        ct = ct + 1
-    #
-    ct = 0
-    if sign == 0:
-        species = False
-        level = 0
-        st = 0
-        while ct < length:
-            if syntax[ct] == '(':
-                deep = deep + 1
+            if c in '+-':
+                return [convert_to_rpn(expr[:ct]),convert_to_rpn(expr[ct+1:]),c]
+    return None
 
-            elif syntax[ct] == ')':
-                deep = deep - 1
-                if deep == 0:
-                    level = level + 1
+    #　演算子の検出　＊
+def find_mul(expr):
+    length = len(expr)
+    level = 0
+    deep = 0
+    for ct, c in enumerate(expr):
+        if c == '(':
+            deep += 1
+        elif c == ')':
+            deep -=  1
+
+        if deep == 0:
+            if c == '*':
+                return [convert_to_rpn(expr[:ct]),convert_to_rpn(expr[ct+1:]),'*']
+            if ct + 1 < length and c.isdigit():
+                if expr[ct+1].isdigit() == False:
+                    level += 1
                     if level == 1:
                         st = ct
-                    
-            elif deep == 0 :
-                level = level + 1
+            else :
+                level += 1
                 if level == 1:
                     st = ct
+        if level == 2:
+            return [convert_to_rpn(expr[:st+1]),convert_to_rpn(expr[st+1:]),'*']
+    return None
 
-            if level == 2:
-                former = porandmake(syntax[0:st+1])
-                latter = porandmake(syntax[st+1:length])
-                return [former,latter,'*']
-                
-            species = syntax[ct].isdigit()
-            ct = ct + 1
-    return syntax
-#   式の入力
-def syntaxget():
-    syntax = input("式を入力してください\n")
-    syntax = syntax.replace(' ','')
-    syntax = syntax.replace(' ','*')
-    syntax = porandmake(syntax)
-    return syntax
-
-syntax = syntaxget()
-print(syntax)
+expr = get_expr()
+print(expr)

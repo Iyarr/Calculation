@@ -7,39 +7,31 @@ class Queue:
     def __init__(self,word):
         self.name = word
         print(word)
-        self.entity = Input.get_formula()
+        self.entity = Input.get_expr()
 #　項の中身(名前、項)
 class Item:
     def __init__(self,name,str):
         self.name = name
         self.compose = [0]*52
         self.number = 1
-        length = len(str)
-        ct = 0
-        while ct < length:
-            num_str = ''
-            if str[ct].isdisit == True:
+        for ct, c in str:
+            if c.isdisit == True:
                 num_str = ''
-                while str[ct].isdisit == True:
-                    num_str = num_str + str[ct]
-                    ct = ct + 1
-                ct = ct - 1
+                while c.isdisit == True:
+                    num_str += c
+                    ct += 1
+                ct -= 1
                 self.number = self.number * int(num_str)
 
             else:
-                ct_str = 0
-                while ct_str < 52:
-                    if str[ct] == string.ascii_letters[ct_str]:
-                        self.compose[ct_str] = self.compose[ct_str] + 1
+                for ct_str in range(52):
+                    if c == string.ascii_letters[ct_str]:
+                        self.compose[ct_str] += 1
                         break
-                    ct_str = ct_str  + 1
-
-            ct = ct + 1
-        
 
 def intensive():
-    syntax = Input.get_formula()
-    array = Method.tostr(syntax)
+    expr = Input.get_expr()
+    array = Method.tostr(expr)
     forign = []
     shuck = []
     mark = []
@@ -48,10 +40,9 @@ def intensive():
             mark.append(word)
             forign.append(Queue(word))
 
-    for word in syntax:
+    for word in expr:
         if word.isalpha() == False and word.isdigit() == False:
             shuck.append(word)
-
 
     for data in forign:
         print(data.name)

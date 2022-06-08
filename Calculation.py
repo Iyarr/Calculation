@@ -1,84 +1,69 @@
 
 class Method:
-    #　逆ポーランド記法への変換
-    def convert_formula_to_rpn(self,formula):
-        length = len(formula)
+#   逆ポーランド記法への変換
+    def convert_to_rpn(self,expr):
+        length = len(expr)
         if length < 2:
-            return formula
-        
-        ct = 0
-        deep = 0
+            return expr
 
-        #　不要な括弧の除去
-        while ct < length:
-            if formula[ct] == '(':
-                deep = deep + 1
-            elif formula[ct] == ')':
-                deep = deep - 1
-                
+        if self.find_brackets(expr) == length-1:
+            expr = expr[1:-1]
+        
+        return self.find_add_sub(expr) or self.find_mul(expr) or expr
+
+        #　不要な括弧の検出
+    def find_brackets(expr):
+        deep = 0
+        for ct, c in enumerate(expr):
+            if c == '(':
+                deep += 1
+            elif c == ')':
+                deep -= 1
+
             if deep == 0:
-                if ct >= length-1:
-                    formula = formula[1:length-1]
-                    length = length - 2
                 break
-            ct = ct + 1
-        
-        sign = 0
-        deep = 0
-        ct = 0
+
+        return ct
+
         #　演算子の検出　＋、ー
-        while ct < length:
-            if formula[ct] == '(':
-                deep = deep + 1
-            elif formula[ct] == ')':
-                deep = deep - 1
-
+    def find_add_sub(self,expr):
+        deep = 0
+        for ct, c in enumerate(expr):
+            if c == '(':
+                deep += 1
+            elif c == ')':
+                    deep += 1
             elif deep == 0:
-                if formula[ct] == '+' or formula[ct] == '-':
-                    former = self.porandmake(self,formula[0:ct])
-                    latter = self.porandmake(self,formula[ct+1:length])
-                    sign = 1
-                    return [former,latter,formula[ct]]
-            ct = ct + 1
-        
+                if c in '+-':
+                    return [self.convert_to_rpn(expr[:ct]),self.convert_to_rpn(expr[ct+1:]),c]
+        return None
+
         #　演算子の検出　＊
-        if sign == 0:
-            level = 0
-            st = 0
-            ct = 0
-            while ct < length:
-                if formula[ct] == '(':
-                    deep = deep + 1
+    def find_mul(self,expr):
+        length = len(expr)
+        level = 0
+        deep = 0
+        for ct, c in enumerate(expr):
+            if c == '(':
+                deep += 1
+            elif c == ')':
+                deep -=  1
 
-                elif formula[ct] == ')':
-                    deep = deep - 1
-                    if deep == 0:
-                        level = level + 1
+            if deep == 0:
+                if c == '*':
+                    return [self.convert_to_rpn(expr[:ct]),self.convert_to_rpn(expr[ct+1:]),'*']
+                if ct + 1 < length and c.isdigit():
+                    if expr[ct+1].isdigit() == False:
+                        level += 1
                         if level == 1:
                             st = ct
-                        
-                elif deep == 0 :
-                    if ct + 1 < length and formula[ct].isdigit():
-                        if formula[ct+1].isdigit() == False:
-                            level = level + 1
-                            if level == 1:
-                                st = ct
-                    else :
-                        level = level + 1
-                        if level == 1:
-                            st = ct
-
-
-                if level == 2 :
-                    former = self.convert_formula_to_rpn(self,formula[0:st+1])
-                    latter = self.convert_formula_to_rpn(self,formula[st+1:length])
-                    return [former,latter,'*']
-                elif formula[ct] == '*':
-                    former = self.convert_formula_to_rpn(self,formula[0:ct])
-                    latter = self.convert_formula_to_rpn(self,formula[ct+1:length])
-                    return [former,latter,'*']
-                ct = ct + 1
-        return formula
+                else :
+                    level += 1
+                    if level == 1:
+                        st = ct
+            if level == 2:
+                return [self.convert_to_rpn(expr[:st+1]),self.convert_to_rpn(expr[st+1:]),'*']
+        return None
         
     def tostr(self,list):
         array = ''
