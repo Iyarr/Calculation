@@ -1,51 +1,35 @@
 import numpy
-import string
-from dataget import Input
 from calculation import Method
-
-class Queue:
-    def __init__(self,word):
-        self.name = word
-        print(word)
-        self.entity = Input.get_expr()
-#　項の中身(名前、項)
-class Item:
-    def __init__(self,name,str):
-        self.name = name
-        self.compose = [0]*52
-        self.number = 1
-        for ct, c in str:
-            if c.isdisit == True:
-                num_str = ''
-                while c.isdisit == True:
-                    num_str += c
-                    ct += 1
-                ct -= 1
-                self.number = self.number * int(num_str)
-
-            else:
-                for ct_str in range(52):
-                    if c == string.ascii_letters[ct_str]:
-                        self.compose[ct_str] += 1
-                        break
+from make_data import Input
+from make_data import Queue
 
 def intensive():
     expr = Input.get_expr()
-    array = Method.tostr(expr)
-    forign = []
-    shuck = []
+    array = Method.convert_to_list(Method,expr)
+    q_stuck = []
+    stuck = []
     mark = []
-    for word in array:
-        if mark.count(word) == 0:
-            mark.append(word)
-            forign.append(Queue(word))
+    #　使用されている文字を記録
+    for dic in array:
+        if mark.count(dic) == 0:
+            #　まだ入っていない文字を格納
+            mark.append(dic)
+            #　文字に対応する行列を登録
+            q_stuck.append(Queue(dic))
 
-    for word in expr:
-        if word.isalpha() == False and word.isdigit() == False:
-            shuck.append(word)
-
-    for data in forign:
-        print(data.name)
-
+    for dic in expr:
+        if dic.isalpha() == True or dic.isdigit() == True:
+            for desc in q_stuck:
+                if dic == desc.name:
+                    stuck.append(desc.entity)
+                    break
+            
+        else:
+            former = stuck[-2]
+            latter = stuck[-1]
+            stuck[-2] = Method.calculator(former,latter,dic)
+            stuck = stuck[:-2]
+                
+    print(stuck)
 
 intensive()
