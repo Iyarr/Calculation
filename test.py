@@ -1,73 +1,42 @@
+import string
 from calculation import Method
 
-#　キーボードからの入力
-def get_expr():
-    return convert_to_rpn(input("式を入力してください\n").replace(' ',''))
 
-#   逆ポーランド記法への変換
-def convert_to_rpn(expr):
-    length = len(expr)
-    if length < 2:
-        return expr
+#　項の中身(名前、項)
+class Item:
+    def __init__(self,str):
+        self.compose = [0]*52
+        self.number = 1
+        self.mul_data(self,str)
 
-    if find_brackets(expr) == length-1:
-        expr = expr[1:-1]
-    
-    return find_add_sub(expr) or find_mul(expr) or expr
+    def mul_data(self,str):
+        if str.isdigit() == True:
+            self.number = self.number * int(str)
 
-    #　不要な括弧の検出
-def find_brackets(expr):
-    deep = 0
-    for ct, c in enumerate(expr):
-        if c == '(':
-            deep += 1
-        elif c == ')':
-            deep -= 1
-
-        if deep == 0:
-            break
-
-    return ct
-
-    #　演算子の検出　＋、ー
-def find_add_sub(expr):
-    deep = 0
-    for ct, c in enumerate(expr):
-        if c == '(':
-           deep += 1
-        elif c == ')':
-                deep += 1
-        elif deep == 0:
-            if c in '+-':
-                return [convert_to_rpn(expr[:ct]),convert_to_rpn(expr[ct+1:]),c]
-    return None
-
-    #　演算子の検出　＊
-def find_mul(expr):
-    length = len(expr)
-    level = 0
-    deep = 0
-    for ct, c in enumerate(expr):
-        if c == '(':
-            deep += 1
-        elif c == ')':
-            deep -=  1
-
-        if deep == 0:
-            if c == '*':
-                return [convert_to_rpn(expr[:ct]),convert_to_rpn(expr[ct+1:]),'*']
-            if ct + 1 < length and c.isdigit():
-                if expr[ct+1].isdigit() == False:
-                    level += 1
-                    if level == 1:
-                        st = ct
-            else :
-                level += 1
-                if level == 1:
-                    st = ct
-        if level == 2:
-            return [convert_to_rpn(expr[:st+1]),convert_to_rpn(expr[st+1:]),'*']
-    return None
-
-expr = get_expr()
-print(expr)
+        else:
+            for ct_str in range(52):
+                if str == string.ascii_letters[ct_str]:
+                    self.compose[ct_str] += 1
+                    break
+def compile(exper):
+        item_list = []
+        for c in exper:
+            if c == '-':
+                item_list[-1].mul_data('-1')
+            elif c == '*':
+                for item in item_list[:-2]:
+                    item.mul_data(item_list[-1])
+            elif c.isalpha():
+                item_list.append(Item(c))
+        result = ''
+        for item in item_list:
+            if item.number > 0:
+                result += '+'
+            result += item.number
+            for ct,values in item.compose:
+                if values != 0:
+                    result += string.ascii_letters[ct]*values
+            
+        return result
+formula = input("式を入力")
+print(compile(Method.convert_to_list(Method,Method.convert_to_rpn(Method,formula))))

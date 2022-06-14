@@ -22,21 +22,17 @@ class Queue:
 
 #　項の中身(名前、項)
 class Item:
-    def __init__(self,name,str):
-        self.name = name
+    def __init__(self,str):
         self.compose = [0]*52
         self.number = 1
-        for ct, c in str:
-            if c.isdigit() == True:
-                num_str = ''
-                while c.isdigit() == True:
-                    num_str += c
-                    ct += 1
-                ct -= 1
-                self.number = self.number * int(num_str)
+        self.mul_data(self,str)
 
-            else:
-                for ct_str in range(52):
-                    if c == string.ascii_letters[ct_str]:
-                        self.compose[ct_str] += 1
-                        break
+    def mul_data(self,str):
+        if str.isdigit() == True:
+            self.number = self.number * int(str)
+
+        else:
+            for ct_str in range(52):
+                if str == string.ascii_letters[ct_str]:
+                    self.compose[ct_str] += 1
+                    break
