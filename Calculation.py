@@ -117,12 +117,16 @@ class Method:
                 return [self.convert_to_rpn(self,expr[:st+1]),self.convert_to_rpn(self,expr[st+1:]),'*']
         return None
         
-    def convert_to_list(self,list):
+    def convert_to_list(self,str):
         array = []
-        for cell in list:
-            length = len(cell)
-            if length <= 1 or cell.isdigit():
-                array.append(cell)
-            elif length > 1:
-                return array + self.convert_to_list(self,cell)
+        for cell in str:
+            if isinstance(cell, list):
+                array += self.convert_to_list(self,cell)
+
+            else:
+                array += cell
+
         return array
+    
+fomula = input("式を入力してください")
+print(Method.convert_to_list(Method,Method.convert_to_rpn(Method,fomula)))
