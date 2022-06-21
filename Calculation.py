@@ -30,7 +30,7 @@ class Method:
                     result[common][column_ct] += '+'+'('+former[row][common_ct]+')'+code+'('+latter[common_ct][column]+')'
                 result[common][column_ct] = Method.convert_to_rpn(Method,result[common][column_ct][1:])
 
-        return compile(Method.convert_to_list(Method,result))
+        return compile(Method.convert_to_str(Method,result))
     
     def compile(exper):
         item_list = []
@@ -84,7 +84,7 @@ class Method:
             if c == '(':
                 deep += 1
             elif c == ')':
-                    deep += 1
+                    deep -= 1
             elif deep == 0:
                 if c in '+-':
                     return [self.convert_to_rpn(self,expr[:ct]),self.convert_to_rpn(self,expr[ct+1:]),c]
@@ -117,16 +117,17 @@ class Method:
                 return [self.convert_to_rpn(self,expr[:st+1]),self.convert_to_rpn(self,expr[st+1:]),'*']
         return None
         
-    def convert_to_list(self,str):
+    def convert_to_str(self,list):
         array = []
-        for cell in str:
-            if isinstance(cell, list):
-                array += self.convert_to_list(self,cell)
+        for cell in list:
+            if isinstance(cell, str):
+                array.append(cell)
 
             else:
-                array += cell
+                array += self.convert_to_str(self,cell)
 
         return array
     
 fomula = input("式を入力してください")
-print(Method.convert_to_list(Method,Method.convert_to_rpn(Method,fomula)))
+#print(Method.convert_to_rpn(Method,fomula))
+print(Method.convert_to_str(Method,Method.convert_to_rpn(Method,fomula)))

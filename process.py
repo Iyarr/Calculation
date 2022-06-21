@@ -5,7 +5,7 @@ from make_data import Queue
 
 def intensive():
     expr = Input.get_expr()
-    array = Method.convert_to_list(Method,expr)
+    array = Method.convert_to_str(Method,expr)
     q_stuck = []
     stuck = []
     mark = []
