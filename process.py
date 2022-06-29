@@ -27,7 +27,22 @@ def intensive():
         else:
             former = stuck[-2]
             latter = stuck[-1]
-            stuck[-2] = Method.calculator(former,latter,dic)
+            if former.isdigit() == True:
+                if latter.isdigit() == True:
+                    if dic == '+':
+                        stuck[-2] = str(int(former)+int(latter))
+                    if dic == '-':
+                        stuck[-2] = str(int(former)-int(latter))
+                    else:
+                        stuck[-2] = str(int(former)*int(latter))
+                else:
+                    stuck[-2] = Method.realnum_mixed_calculator(latter,former,dic)
+            else:
+                if latter.isdigit() == True:
+                    stuck[-2] = Method.realnum_mixed_calculator(former,latter,dic)
+                else:
+                    stuck[-2] = Method.calculator(former,latter,dic)
+
             stuck = stuck[:-2]
                 
     print(stuck)

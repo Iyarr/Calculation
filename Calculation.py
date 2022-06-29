@@ -2,9 +2,10 @@ import string
 
 #　項の中身(名前、項)
 class Item:
-    def __init__(self,str):
+    def __init__(self,str,deep):
         self.compose = [0]*52
         self.number = 1
+        self.deep = deep
         self.mul_data(self,str)
 
     def mul_data(self,str):
@@ -17,7 +18,18 @@ class Item:
                     self.compose[ct_str] += 1
                     break
 class Method:
-    
+    def realnum_mixed_calculator(queue,num,code):
+        row_ct = len(queue)
+        column_ct = len(queue[0])
+        result = ['']*row_ct*column_ct
+        
+        for row in range(row_ct):
+            result[row] = ['']*column_ct
+            for column in range(column_ct):
+                result[row][column] = '(' + queue[row][column] + ')' + code + num
+                result[row][column] = compile(Method,Method.convert_to_rpn(Method,result[row][column]))
+        return result
+
     def calculator(former,latter,code):
         row_ct = len(former)
         column_ct = len(latter[0])
@@ -28,20 +40,36 @@ class Method:
             for column in range(column_ct):
                 for common in range(common_ct):
                     result[common][column_ct] += '+'+'('+former[row][common_ct]+')'+code+'('+latter[common_ct][column]+')'
-                result[common][column_ct] = Method.convert_to_rpn(Method,result[common][column_ct][1:])
-
-        return compile(Method.convert_to_str(Method,result))
+                result[common][column_ct] = compile(Method,Method.convert_to_rpn(Method,result[common][column_ct][1:]))
+            
+        return result
     
     def compile(exper):
         item_list = []
-        for c in exper:
-            if c == '-':
-                item_list[-1].mul_data('-1')
+        deep_ct = 0
+        deep_st = [0]
+        for ct,c in enumerate(exper):
+            if c in '+-':
+                for item in reversed(item_list):
+                    if item.deep != deep_ct:
+                        break
+                    
+                    if c == '-':
+                        item.mul_data('-1')
+
+                    item.deep -= 1
+                
+                deep_ct -= 1
+
             elif c == '*':
                 for item in item_list[:-2]:
                     item.mul_data(item_list[-1])
-            elif c.isalpha():
-                item_list.append(Item(c))
+            #　演算子じゃなかったらもう項を製作する
+            else :
+                item_list.append(Item(c,deep_ct))
+                if( deep_ct > 1 ):
+                    deep_ct = 1
+                    deep_st += 1
         result = ''
         for item in item_list:
             if item.number > 0:
@@ -52,6 +80,10 @@ class Method:
                     result += string.ascii_letters[ct]*values
             
         return result
+    #　リストの中だけに着目して計算する関数
+    def compile_recursive(exper,deep):
+
+        return exper
 #   逆ポーランド記法への変換
     def convert_to_rpn(self,expr):
         length = len(expr)
