@@ -2,21 +2,29 @@ import string
 
 #　項の中身(名前、項)
 class Item:
-    def __init__(self,str,deep):
-        self.compose = [0]*52
-        self.number = 1
-        self.deep = deep
-        self.mul_data(self,str)
-
-    def mul_data(self,str):
-        if str.isdigit() == True:
-            self.number = self.number * int(str)
-
+    def __init__(self,str):
+        if str[0] == '-':
+            self.number = -1
         else:
-            for ct_str in range(52):
-                if str == string.ascii_letters[ct_str]:
-                    self.compose[ct_str] += 1
-                    break
+            self.number = 1
+        self.compose = [0]*52
+        switch = 0
+        num = ''
+        for c in str:
+            if c.isdigit() == False:
+                switch = 1
+            
+            if switch == 0:
+                num = num + c
+
+            else:
+                for ct_str in range(52):
+                    if str == string.ascii_letters[ct_str]:
+                        self.compose[ct_str] += 1
+                        break
+        if len(num) > 0:
+            self.number *= int(num)
+    
 class Method:
     def realnum_mixed_calculator(queue,num,code):
         row_ct = len(queue)
@@ -27,7 +35,7 @@ class Method:
             result[row] = ['']*column_ct
             for column in range(column_ct):
                 result[row][column] = '(' + queue[row][column] + ')' + code + num
-                result[row][column] = compile(Method,Method.convert_to_rpn(Method,result[row][column]))
+                result[row][column] = compile(Method.convert_to_rpn(Method,result[row][column]))
         return result
 
     def calculator(former,latter,code):
@@ -40,50 +48,57 @@ class Method:
             for column in range(column_ct):
                 for common in range(common_ct):
                     result[common][column_ct] += '+'+'('+former[row][common_ct]+')'+code+'('+latter[common_ct][column]+')'
-                result[common][column_ct] = compile(Method,Method.convert_to_rpn(Method,result[common][column_ct][1:]))
+                result[common][column_ct] = compile(Method.convert_to_rpn(Method,result[common][column_ct][1:]))
             
         return result
     
     def compile(exper):
-        item_list = []
-        deep_ct = 0
-        deep_st = [0]
-        for ct,c in enumerate(exper):
-            if c in '+-':
-                for item in reversed(item_list):
-                    if item.deep != deep_ct:
-                        break
-                    
-                    if c == '-':
-                        item.mul_data('-1')
-
-                    item.deep -= 1
-                
-                deep_ct -= 1
-
-            elif c == '*':
-                for item in item_list[:-2]:
-                    item.mul_data(item_list[-1])
-            #　演算子じゃなかったらもう項を製作する
-            else :
-                item_list.append(Item(c,deep_ct))
-                if( deep_ct > 1 ):
-                    deep_ct = 1
-                    deep_st += 1
-        result = ''
-        for item in item_list:
-            if item.number > 0:
-                result += '+'
-            result += item.number
-            for ct,values in enumerate(item.compose):
-                if values != 0:
-                    result += string.ascii_letters[ct]*values
+        if len(exper) < 3:
+            return exper
+        elif exper[2].isdigit() == True or exper[2].isalpha() == True:
+            return exper
+        
+        # それぞれ普通の計算式が来たと仮定する
+        former = compile(exper[0])
+        latter = compile(exper[1])
+        code = exper[2]
+ 
+        if code == '+':
+            if former.isdigit() == True and latter.isdigit() == True:
+                return str(int(former)+int(latter))
             
-        return result
-    #　リストの中だけに着目して計算する関数
-    def compile_recursive(exper,deep):
+            if latter[0] == '-':
+                return former+latter
+            
+            return former+'+'+latter
 
+        if code == '-':
+            if former.isdigit() == True and latter.isdigit() == True:
+                return str(int(former)-int(latter))
+            
+            if latter[0] != '-':
+                latter = '+'+latter
+            return former + latter.replace('-','*').replace('+','-').replace('*','+')
+            
+        if code == '*':
+            result = ''
+            for former_pertition in former.replace('+','*+').replace('-','*-').split('*'):
+                for latter_pertition in latter.replace('+','*+').replace('-','*-').split('*'):
+                    result = result + Method.mul_cal(former_pertition,latter_pertition)
+
+            return result
         return exper
+    #　リストの中だけに着目して計算する関数
+    def mul_cal(former,latter):
+        former_item = Item(former)
+        latter_item = Item(latter)
+        result = str(former_item.number * latter_item.number)
+        for ct_str in range(52):
+            former_item.compose[ct_str] += latter_item.compose[ct_str]
+            for log in range(former_item.compose[ct_str]):
+                result = result + string.ascii_letters[ct_str]
+        
+        return result
 #   逆ポーランド記法への変換
     def convert_to_rpn(self,expr):
         length = len(expr)
@@ -159,7 +174,3 @@ class Method:
                 array += self.convert_to_str(self,cell)
 
         return array
-    
-fomula = input("式を入力してください")
-#print(Method.convert_to_rpn(Method,fomula))
-print(Method.convert_to_str(Method,Method.convert_to_rpn(Method,fomula)))

@@ -1,4 +1,3 @@
-import numpy
 from calculation import Method
 from make_data import Input
 from make_data import Queue
