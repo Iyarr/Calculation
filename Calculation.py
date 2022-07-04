@@ -99,6 +99,7 @@ class Method:
                 result = result + string.ascii_letters[ct_str]
         
         return result
+
 #   逆ポーランド記法への変換
     def convert_to_rpn(self,expr):
         length = len(expr)
@@ -126,43 +127,69 @@ class Method:
 
         #　演算子の検出　＋、ー
     def find_add_sub(self,expr):
+        result = []
+        code = []
+        code_ct = 0
         deep = 0
+        st = 0
+        if expr == '-':
+            code_ct = 1
         for ct, c in enumerate(expr):
-            if c == '(':
-                deep += 1
-            elif c == ')':
-                    deep -= 1
-            elif deep == 0:
+            deep = self.deep_process(deep,c)
+            if deep == 0:
                 if c in '+-':
-                    return [self.convert_to_rpn(self,expr[:ct]),self.convert_to_rpn(self,expr[ct+1:]),c]
-        return None
+                    result.append(self.convert_to_rpn(self,expr[st:ct]))
+                    code.append(c)
+                    code_ct += 1
+                    if code_ct >= 2:
+                        result.append(code[0])
+                        code.pop(0)
+                        code_ct = 1
+                    st = ct + 1
+        
+        if len(result) < 1:
+            return None
+
+        result.append(self.convert_to_rpn(self,expr[st:]))
+        result.append(code[-1])
+        return result
 
         #　演算子の検出　＊
     def find_mul(self,expr):
-        length = len(expr)
-        level = 0
+        if len(expr) < 2:
+            return None
+        result = []
+        code_ct = 0
         deep = 0
+        st = 0
         for ct, c in enumerate(expr):
-            if c == '(':
-                deep += 1
-            elif c == ')':
-                deep -=  1
-
+            deep = self.deep_process(deep,c)
             if deep == 0:
-                if c == '*':
-                    return [self.convert_to_rpn(self,expr[:ct]),self.convert_to_rpn(self,expr[ct+1:]),'*']
-                if ct + 1 < length and c.isdigit():
-                    if expr[ct+1].isdigit() == False:
-                        level += 1
-                        if level == 1:
-                            st = ct
-                else :
-                    level += 1
-                    if level == 1:
-                        st = ct
-            if level == 2:
-                return [self.convert_to_rpn(self,expr[:st+1]),self.convert_to_rpn(self,expr[st+1:]),'*']
-        return None
+                if self.data_spices(expr,ct) < 2:
+                    result.append(self.convert_to_rpn(self,expr[st:ct+1]))
+                    code_ct += 1
+                    if( code_ct > 1 ):
+                        result.append('*')
+                        code_ct = 1
+                    st = ct+1
+        return result
+
+        #　2桁以上の数値のデータをつなげる
+    def data_spices(expr,ct):
+        result = 0
+        if ct < len(expr)-1:
+            for data in [expr[ct],expr[ct+1]]:
+                if data == '-' or data.isdigit() == True:
+                    result += 1
+        return result
+
+        #　再帰関数の深さ
+    def deep_process(deep,c):
+        if c == '(':
+            deep += 1
+        elif c == ')':
+            deep -= 1
+        return deep
         
     def convert_to_str(self,list):
         array = []
