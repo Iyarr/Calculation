@@ -2,7 +2,7 @@ from calculation import Method
 from make_data import Input
 from make_data import Queue
 
-def intensive():
+def index():
     expr = Input.get_expr()
     array = Method.convert_to_str(Method,expr)
     q_stuck = []
@@ -46,4 +46,4 @@ def intensive():
                 
     print(stuck)
 
-intensive()
+index()

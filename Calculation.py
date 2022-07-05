@@ -5,16 +5,23 @@ class Item:
     def __init__(self,str):
         if str[0] == '-':
             self.number = -1
+            str = str[1:]
         else:
             self.number = 1
         self.compose = [0]*52
         switch = 0
-        num = ''
         for c in str:
             if c.isdigit() == False:
+                if switch == 1:
+                    self.number *= int(num)
+
+                switch = 0
+
+            else:
                 switch = 1
-            
-            if switch == 0:
+                num = ''
+
+            if switch == 1:
                 num = num + c
 
             else:
@@ -22,8 +29,6 @@ class Item:
                     if str == string.ascii_letters[ct_str]:
                         self.compose[ct_str] += 1
                         break
-        if len(num) > 0:
-            self.number *= int(num)
     
 class Method:
     def realnum_mixed_calculator(queue,num,code):

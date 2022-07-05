@@ -8,65 +8,78 @@ def compile(exper):
             return exper
         elif exper[2] in '-+*' == False:
             return exper
-        
+
         # それぞれ普通の計算式が来たと仮定する
-        former = compile(exper[0]).replace('+','/').replace('-','/-')
-        latter = compile(exper[1]).replace('+','/').replace('-','/-')
-        code = exper[2]
-        result = ''
+        stuck = []
+        for partition in exper:
+            if partition in '-+':
+                stuck[-2] = add_cal(compile(stuck[-2]),compile(stuck[-1]),partition)
+                stuck.pop(-1)
 
-        if code in '+-':
-            sign = 0
-            for former_c in former.split('/'):
-                if former_c.isdigit() == True:
-                    sign = 1
-                    break
-            
-            if sign == 1:
-                for latter_c in latter.split('/'):
-                    if latter_c.isdigit() == True:
-                        if code == '+':
-                            num = int(former_c)+int(latter_c)
-                        else:
-                            num = int(former_c)-int(latter_c)
-                        
-                        former = former +'/'+ str(num)
-                        former = former.replace(former_c,'').replace('//','/')
-                        latter = latter.replace(latter_c,'').replace('//','/')
-                        break
+            elif partition == '*':
+                stuck[-2] = mul_cal(compile(stuck[-2]),compile(stuck[-1]))
+                stuck.pop(-1)
 
-            former = former.replace('/-','-').replace('/','+').strip('+')
-            latter = latter.replace('/-','-').replace('/','+').strip('+')
-
-            if latter == '':
-                return former
-
-            elif latter[0] != '-':
-                latter = '+' + latter
-
-            if code == '+':
-                result = former+latter
             else:
-                result = former+latter.replace('+','/').replace('-','+').replace('/','-')
-            
-        elif code == '*':
-            for former_pertition in former.split('*'):
-                for latter_pertition in latter.split('*'):
-                    result = result + mul_cal(former_pertition,latter_pertition)
+                stuck.append(partition)
 
-    return result
+    return stuck[0]
 
 def mul_cal(former,latter):
     if 1 == 1:
-        former_item = Item(former)
-        latter_item = Item(latter)
-        result = str(former_item.number * latter_item.number)
-        if result == '1':
-            result = ''
+        result= []
+        for former_c in former.split('/'):
+            for latter_c in latter.split('/'):
+                if former_c[-1].isdigit() and ( latter_c[0].isdigit() or latter_c[:1].isdigit() ):
+                    result += former_c + '|' + latter_c
+                else:
+                    result += former_c + latter_c
+
+    return cleaner(result)
+
+def add_cal(former,latter,code):
+
+    if latter[0] != '-':
+        latter = '+' + latter
+
+    if code == '+':
+        result = former + latter
+
+    else:
+        result = former + latter.replace('+','/').replace('-','+').replace('/','-')
+
+    return cleaner(result)
+
+def cleaner(exper):
+    exper = exper[0] + exper[1:].replace('+','/').replace('-','/-')
+    inventory = [Item]
+    for data in exper.split('/'):
+        current = Item(data)
+        identical = 1
+        for comparison in inventory[:-2]:
+            for ct_str in range(52):
+                if current.compose[ct_str] != comparison.compose[ct_str]:
+                    identical = 0
+                    break
+            if identical == 1:
+                comparison.number += current.number
+                break
+    
+        if identical == 0:
+            inventory.append(current)
+    result = ''
+    for comparison in inventory:
+        if comparison.number > 0:
+            result += '+' + str(comparison.number)
+        elif comparison.number == 0:
+            continue
+
         for ct_str in range(52):
-            former_item.compose[ct_str] += latter_item.compose[ct_str]
-            for log in range(former_item.compose[ct_str]):
-                result = result + string.ascii_letters[ct_str]
+            result += string.ascii_letters[ct_str]*comparison.compose[ct_str]
+
+    if result[0] == '+':
+        result = result[1:]
+
     return result
 
 data = Input.get_expr()
