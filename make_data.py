@@ -23,7 +23,7 @@ class Queue:
 #　項の中身(名前、項)
 class Item:
     def __init__(self,str):
-        self.compose = [0]*52
+        self.compose = [0]*26
         self.number = 1
         self.mul_data(self,str)
 
@@ -32,7 +32,7 @@ class Item:
             self.number = self.number * int(str)
 
         else:
-            for ct_str in range(52):
+            for ct_str in range(26):
                 if str == string.ascii_letters[ct_str]:
                     self.compose[ct_str] += 1
                     break

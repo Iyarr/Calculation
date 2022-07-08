@@ -12,30 +12,52 @@ def compile(exper):
         # それぞれ普通の計算式が来たと仮定する
         stuck = []
         for partition in exper:
-            if partition in '-+':
-                stuck[-2] = add_cal(compile(stuck[-2]),compile(stuck[-1]),partition)
+            if  isinstance(partition,list):
+                stuck.append(compile(partition))
+
+            elif partition in '-+':
+                stuck[-2] = add_cal(stuck[-2],stuck[-1],partition)
                 stuck.pop(-1)
 
             elif partition == '*':
-                stuck[-2] = mul_cal(compile(stuck[-2]),compile(stuck[-1]))
+                stuck[-2] = mul_cal(stuck[-2],stuck[-1])
                 stuck.pop(-1)
 
             else:
-                stuck.append(partition)
+                stuck.append(compile(partition))
 
     return stuck[0]
 
 def mul_cal(former,latter):
     if 1 == 1:
-        result= []
+        result= ''
+        former = former[0] + former[1:].replace('+','/').replace('-','/-')
+        latter = latter[0] + latter[1:].replace('+','/').replace('-','/-')
         for former_c in former.split('/'):
+            if former_c[0] == '-':
+                former_code = 'minus'
+                former_c = former_c[1:]
+            else:
+                former_code = 'plus'
+
             for latter_c in latter.split('/'):
+                if latter_c[0] == '-':
+                    latter_code = 'minus'
+                    latter_c = latter_c[1:]
+                else:
+                    latter_code = 'plus'
+
+                if former_code == latter_code:
+                    result += '+'
+                else:
+                    result += '-'
+
                 if former_c[-1].isdigit() and ( latter_c[0].isdigit() or latter_c[:1].isdigit() ):
                     result += former_c + '|' + latter_c
                 else:
                     result += former_c + latter_c
 
-    return cleaner(result)
+    return cleaner(result[1:])
 
 def add_cal(former,latter,code):
 
@@ -52,32 +74,37 @@ def add_cal(former,latter,code):
 
 def cleaner(exper):
     exper = exper[0] + exper[1:].replace('+','/').replace('-','/-')
-    inventory = [Item]
+    inventory = []
     for data in exper.split('/'):
         current = Item(data)
-        identical = 1
+        identical = 0
         if len(inventory) > 0:
-            for comparison in inventory:
-                for ct_str in range(52):
+            for ct,comparison in enumerate(inventory):
+                for ct_str in range(26):
                     if current.compose[ct_str] != comparison.compose[ct_str]:
-                        identical = 0
                         break
-                if identical == 1:
-                    comparison.number += current.number
+                if ct_str == 25:
+                    inventory[ct].number += current.number
+                    identical = 1
                     break
-        else:
-            identical = 0
-    
+
         if identical == 0:
             inventory.append(current)
+
     result = ''
     for comparison in inventory:
-        if comparison.number > 0:
-            result += '+' + str(comparison.number)
-        elif comparison.number == 0:
+        if comparison.number > 0 :
+            result += '+'
+            if comparison.number != 1:
+                result += '+' + str(comparison.number)
+        elif comparison.number != 0:
+            result += '-'
+            if comparison.number != -1:
+                result += + str(-comparison.number)
+        else:
             continue
 
-        for ct_str in range(52):
+        for ct_str in range(26):
             result += string.ascii_letters[ct_str]*comparison.compose[ct_str]
 
     if result[0] == '+':

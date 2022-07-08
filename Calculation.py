@@ -8,7 +8,7 @@ class Item:
             str = str[1:]
         else:
             self.number = 1
-        self.compose = [0]*52
+        self.compose = [0]*26
         switch = 0
         for c in str:
             if c.isdigit() == False:
@@ -22,8 +22,8 @@ class Item:
             if switch == 1:
                 num = num + c
             else:
-                for ct_str in range(52):
-                    if str == string.ascii_letters[ct_str]:
+                for ct_str in range(26):
+                    if c == string.ascii_letters[ct_str]:
                         self.compose[ct_str] += 1
                         break
 class Method:
