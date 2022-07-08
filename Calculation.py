@@ -14,22 +14,18 @@ class Item:
             if c.isdigit() == False:
                 if switch == 1:
                     self.number *= int(num)
-
                 switch = 0
-
             else:
                 switch = 1
                 num = ''
 
             if switch == 1:
                 num = num + c
-
             else:
                 for ct_str in range(52):
                     if str == string.ascii_letters[ct_str]:
                         self.compose[ct_str] += 1
                         break
-    
 class Method:
     def realnum_mixed_calculator(queue,num,code):
         row_ct = len(queue)
@@ -127,7 +123,6 @@ class Method:
 
             if deep == 0:
                 break
-
         return ct
 
         #　演算子の検出　＋、ー
@@ -176,7 +171,7 @@ class Method:
                     if( code_ct > 1 ):
                         result.append('*')
                         code_ct = 1
-                    st = ct+1
+                    st = ct + 1
         return result
 
         #　2桁以上の数値のデータをつなげる
@@ -201,7 +196,6 @@ class Method:
         for cell in list:
             if isinstance(cell, str):
                 array.append(cell)
-
             else:
                 array += self.convert_to_str(self,cell)
 

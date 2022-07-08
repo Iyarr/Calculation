@@ -1,6 +1,5 @@
 from calculation import Method
-from make_data import Input
-from make_data import Queue
+from make_data import Input,Queue
 
 def index():
     expr = Input.get_expr()

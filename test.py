@@ -1,5 +1,5 @@
 import string
-from calculation import Item
+from calculation import Item,Method
 from make_data import Input
 
 def compile(exper):
@@ -56,14 +56,17 @@ def cleaner(exper):
     for data in exper.split('/'):
         current = Item(data)
         identical = 1
-        for comparison in inventory[:-2]:
-            for ct_str in range(52):
-                if current.compose[ct_str] != comparison.compose[ct_str]:
-                    identical = 0
+        if len(inventory) > 0:
+            for comparison in inventory:
+                for ct_str in range(52):
+                    if current.compose[ct_str] != comparison.compose[ct_str]:
+                        identical = 0
+                        break
+                if identical == 1:
+                    comparison.number += current.number
                     break
-            if identical == 1:
-                comparison.number += current.number
-                break
+        else:
+            identical = 0
     
         if identical == 0:
             inventory.append(current)
@@ -82,5 +85,7 @@ def cleaner(exper):
 
     return result
 
-data = Input.get_expr()
+data = input()
+data = Method.convert_to_rpn(Method,data)
 print(data)
+print(compile(data))
