@@ -6,8 +6,6 @@ def compile(exper):
     if 1 == 1:
         if len(exper) < 3:
             return exper
-        elif exper[2] in '-+*' == False:
-            return exper
 
         # それぞれ普通の計算式が来たと仮定する
         stuck = []
@@ -15,7 +13,7 @@ def compile(exper):
             if  isinstance(partition,list):
                 stuck.append(compile(partition))
 
-            elif partition in '-+':
+            elif partition == '+'or partition == '-':
                 stuck[-2] = add_cal(stuck[-2],stuck[-1],partition)
                 stuck.pop(-1)
 
@@ -96,11 +94,11 @@ def cleaner(exper):
         if comparison.number > 0 :
             result += '+'
             if comparison.number != 1:
-                result += '+' + str(comparison.number)
+                result += str(comparison.number)
         elif comparison.number != 0:
             result += '-'
             if comparison.number != -1:
-                result += + str(-comparison.number)
+                result += str( -1 * comparison.number)
         else:
             continue
 
