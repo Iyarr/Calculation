@@ -45,17 +45,17 @@ def mul_cal(former,latter):
                 else:
                     latter_code = 'plus'
 
-                if former_code == latter_code:
-                    result += '+'
-                else:
+                if former_code != latter_code:
                     result += '-'
+                else:
+                    result += '+'
 
                 if former_c[-1].isdigit() and ( latter_c[0].isdigit() or latter_c[:1].isdigit() ):
                     result += former_c + '|' + latter_c
                 else:
                     result += former_c + latter_c
 
-    return cleaner(result[1:])
+    return cleaner(result)
 
 def add_cal(former,latter,code):
 

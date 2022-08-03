@@ -16,8 +16,9 @@ class Item:
                     self.number *= int(num)
                 switch = 0
             else:
-                switch = 1
-                num = ''
+                if switch == 0:
+                    switch = 1
+                    num = ''
 
             if switch == 1:
                 num = num + c
@@ -26,6 +27,8 @@ class Item:
                     if c == string.ascii_letters[ct_str]:
                         self.compose[ct_str] += 1
                         break
+        if switch == 1:
+            self.number *= int(num)
 class Method:
     def realnum_mixed_calculator(self,queue,num,code):
         row_ct = len(queue)
@@ -35,21 +38,20 @@ class Method:
         for row in range(row_ct):
             result[row] = ['']*column_ct
             for column in range(column_ct):
-                result[row][column] = '(' + queue[row][column] + ')' + code + num
-                result[row][column] = self.compile(self.convert_to_rpn(self,result[row][column]))
+                result[row][column] = self.compile([result[row][column],num,code])
         return result
 
     def calculator(self,former,latter,code):
         row_ct = len(former)
         column_ct = len(latter[0])
         common_ct = len(latter)
-        result = ['']*row_ct*column_ct
+        result = []*row_ct*column_ct
         for row in range(row_ct):
-            result[row] = ['']*column_ct
+            result[row] = ['0']*column_ct
             for column in range(column_ct):
                 for common in range(common_ct):
-                    result[common][column_ct] += '+'+'('+former[row][common_ct]+')'+code+'('+latter[common_ct][column]+')'
-                result[common][column_ct] = self.compile(self.convert_to_rpn(self,result[common][column_ct][1:]))
+                    result[common][column_ct] = [result[common][column_ct],[former[row][common_ct],latter[common_ct][column],code],'+']
+                result[common][column_ct] = self.compile(result[common][column_ct])
             
         return result
     
@@ -64,15 +66,15 @@ class Method:
                 stuck.append(compile(partition))
 
             elif partition == '+'or partition == '-':
-                stuck[-2] = self.add_cal(stuck[-2],stuck[-1],partition)
+                stuck[-2] = self.add_cal(self,stuck[-2],stuck[-1],partition)
                 stuck.pop(-1)
 
             elif partition == '*':
-                stuck[-2] = self.mul_cal(stuck[-2],stuck[-1])
+                stuck[-2] = self.mul_cal(self,stuck[-2],stuck[-1])
                 stuck.pop(-1)
 
             else:
-                stuck.append(self.compile(partition))
+                stuck.append(self.compile(self,partition))
 
         return stuck[0]
 
@@ -94,17 +96,17 @@ class Method:
                 else:
                     latter_code = 'plus'
 
-                if former_code == latter_code:
-                    result += '+'
-                else:
+                if former_code != latter_code:
                     result += '-'
+                else:
+                    result += '+'
 
                 if former_c[-1].isdigit() and ( latter_c[0].isdigit() or latter_c[:1].isdigit() ):
                     result += former_c + '|' + latter_c
                 else:
                     result += former_c + latter_c
 
-        return self.cleaner(result[1:])
+        return self.cleaner(result)
 
     def add_cal(self,former,latter,code):
 
@@ -158,7 +160,6 @@ class Method:
             result = result[1:]
 
         return result
-
 #   逆ポーランド記法への変換
     def convert_to_rpn(self,expr):
         length = len(expr)
@@ -187,9 +188,7 @@ class Method:
     def find_add_sub(self,expr):
         result = []
         code = []
-        code_ct = 0
-        deep = 0
-        st = 0
+        code_ct = deep = st = 0
         if expr == '-':
             code_ct = 1
         for ct, c in enumerate(expr):
@@ -208,37 +207,43 @@ class Method:
         if len(result) < 1:
             return None
 
-        result.append(self.convert_to_rpn(self,expr[st:]))
-        result.append(code[-1])
-        return result
+        return result.append(self.convert_to_rpn(self,expr[st:])).append(code[-1])
 
         #　演算子の検出　＊
+
     def find_mul(self,expr):
         if len(expr) < 2:
             return None
         result = []
-        code_ct = 0
-        deep = 0
-        st = 0
+        code_ct = deep = st = 0
         for ct, c in enumerate(expr):
             deep = self.deep_process(deep,c)
             if deep == 0:
-                if self.data_spices(expr,ct) < 2:
+                if c == '*':
+                    st += 1
+
+                elif ct >= len(expr)-1:
                     result.append(self.convert_to_rpn(self,expr[st:ct+1]))
                     code_ct += 1
-                    if( code_ct > 1 ):
-                        result.append('*')
-                        code_ct = 1
+                    st = ct + 1
+
+                elif (( c.isdigit() or c == '-' ) and expr[ct+1].isdigit()) == False:
+                    result.append(self.convert_to_rpn(self,expr[st:ct+1]))
+                    code_ct += 1
+                    st = ct + 1
+            
+                if( code_ct > 1 ):
+                    result.append('*')
+                    code_ct = 1
                     st = ct + 1
         return result
 
         #　2桁以上の数値のデータをつなげる
-    def data_spices(expr,ct):
-        result = 0
-        if ct < len(expr)-1:
-            for data in [expr[ct],expr[ct+1]]:
-                if data == '-' or data.isdigit() == True:
-                    result += 1
+    def next_data(c,next_c):
+        result = True
+        if ( c.isdigit() or c == '-' )and next_c.isdigit():
+            result = False
+
         return result
 
         #　再帰関数の深さ
@@ -249,7 +254,7 @@ class Method:
             deep -= 1
         return deep
 
-#   list型をstr型に
+        #  list型をstr型に
     def convert_to_str(self,list):
         array = []
         for cell in list:

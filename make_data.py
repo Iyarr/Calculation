@@ -4,11 +4,14 @@ from calculation import Method
 class Input:
     def get_queue():
         queue = []
+        row_rpm = []
         while(1):
             row = input()
             if( row == ''):
                 break
-            queue.append(row.split(" "))
+            for row_divide in row.split(" "):
+                row_rpm.append(Method.convert_to_rpn(Method,row_divide))
+            queue.append(row_rpm)
         return queue
 
     def get_expr():
