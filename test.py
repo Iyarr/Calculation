@@ -59,7 +59,7 @@ def mul_cal(former,latter):
 
 def add_cal(former,latter,code):
 
-    if latter[0] != '-':
+    if latter[0] != '-' and len(former) != 0:
         latter = '+' + latter
 
     if code == '+':

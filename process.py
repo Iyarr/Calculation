@@ -41,8 +41,8 @@ def index():
                 else:
                     stuck[-2] = Method.calculator(former,latter,dic)
 
-            stuck = stuck[:-2]
-                
+            stuck.pop(-1)
+
     print(stuck)
 
 index()

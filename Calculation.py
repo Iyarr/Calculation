@@ -189,8 +189,6 @@ class Method:
         result = []
         code = []
         code_ct = deep = st = 0
-        if expr == '-':
-            code_ct = 1
         for ct, c in enumerate(expr):
             deep = self.deep_process(deep,c)
             if deep == 0:
@@ -207,7 +205,8 @@ class Method:
         if len(result) < 1:
             return None
 
-        return result.append(self.convert_to_rpn(self,expr[st:])).append(code[-1])
+        result.append(self.convert_to_rpn(self,expr[st:]))
+        return result.append(code[-1])
 
         #　演算子の検出　＊
 
