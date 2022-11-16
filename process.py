@@ -21,7 +21,7 @@ def index():
                 if dic == desc.name:
                     stuck.append(desc.entity)
                     break
-            
+
         else:
             former = stuck[-2]
             latter = stuck[-1]
