@@ -1,130 +1,114 @@
 import string
-#　項の中身(名前、項)
-class Item:
-    def __init__(self,str):
-        if str[0] == '-':
+import re
+from rpm_test import Method
+class Item:     #　項の中身(名前、項)
+    def __init__(self,item):
+        self.number = 1
+        if item[0] == '-':
             self.number = -1
-            str = str[1:]
-        else:
-            self.number = 1
-        # アルファベットは26文字
-        self.alphabet_compose = [0]*26
-        borderline = self.__locate_borderline_alpha_and_number(str)
+            item = item[1:]
+        borderline = len(re.split('*[0-9]',item,1)[1])+1    #正規表現で左側の数字の文字列の長さを検出して格納する
+        self.alphabet_compose = item[borderline:].sorted()
         if borderline > 0:
-            self.number *= int(str[:borderline])
-
-        for c in str[borderline:]:
-            self.alphabet_compose[ord(c)-ord('a')] += 1
-
-    def __locate_borderline_alpha_and_number(str):
-        for ct,c in enumerate(str):
-            if c.isdecimal() == False:
-                break
-        return ct
+            self.number *= int(item[:borderline])
 
 class cal:
     def compile(self,exper):
-        if len(exper) < 3:
+        if isinstance(exper,str) or len(exper) == 0:
             return exper
-
-        # それぞれ普通の計算式が来たと仮定する
-        stuck = []
+        output = []
         for partition in exper:
             if  isinstance(partition,list):
-                stuck.append(compile(partition))
+                output.append(compile(partition))
 
             elif partition == '+'or partition == '-':
-                stuck[-2] = self.add_cal(self,stuck[-2],stuck[-1],partition)
-                stuck.pop(-1)
+                output[-2] = self.add_sub_cal(self,output[-2],output[-1],partition)
+                output.pop(-1)
 
             elif partition == '*':
-                stuck[-2] = self.mul_cal(self,stuck[-2],stuck[-1])
-                stuck.pop(-1)
+                output[-2] = self.mul_cal(self,output[-2],output[-1])
+                output.pop(-1)
 
             else:
-                stuck.append(self.compile(self,partition))
+                output.append(partition)
 
-        return stuck[0]
+        return output[0]
 
     def mul_cal(self,former,latter):
-        result= ''
-        former = former[0] + former[1:].replace('+','/').replace('-','/-')
-        latter = latter[0] + latter[1:].replace('+','/').replace('-','/-')
-        for former_c in former.split('/'):
-            if former_c[0] == '-':
-                former_code = 'minus'
-                former_c = former_c[1:]
-            else:
-                former_code = 'plus'
+        class expr_compose:
+            def __init__(expr):
+                expr_devided = expr[0] + expr[1:].replace('+','/').replace('-','/-')#演算子ごとに'/'を付けるが先頭の'-'には'/'を付けない
+                self.item_count = expr_devided.count('/')+1
+                self.expr_compose = [Item]*self.item_count
+                for ct,splited in enumerate(self.item_count):
+                    self.expr_compose[ct] = Item(splited[ct])
+        output= ''
+        F_formura = expr_compose(former)
+        L_formura = expr_compose(latter)
+        for F_count in enumerate(F_formura.count):
+            for L_count in enumerate(L_formura.count):
+                number = F_formura.expr_compose[F_count].number * L_formura.expr_compose[L_count].number
+                add_compose = ''
+                if number == -1:
+                    add_compose += str( '-' )
+                elif number != 1:
+                    add_compose += str( number )
 
-            for latter_c in latter.split('/'):
-                if latter_c[0] == '-':
-                    latter_code = 'minus'
-                    latter_c = latter_c[1:]
-                else:
-                    latter_code = 'plus'
+                add_compose += ( F_formura.expr_compose[F_count] + L_formura.expr_compose[L_count] ).sorted()
+                if add_compose == '-':   #文字が何もなくて定数が-1だった時への対処
+                    add_compose = '-1'
+                elif add_compose[0] != '-' and len(output) > 0:
+                    add_compose = '+' + add_compose
+                output += add_compose
 
-                if former_code != latter_code:
-                    result += '-'
-                else:
-                    result += '+'
+        return self.cleaner(output)
 
-                if former_c[-1].isdigit() and ( latter_c[0].isdigit() or latter_c[:1].isdigit() ):
-                    result += former_c + '|' + latter_c
-                else:
-                    result += former_c + latter_c
-
-        return self.cleaner(result)
-
-    def add_cal(self,former,latter,code):
+    def add_sub_cal(self,former,latter,code):
 
         if latter[0] != '-':
             latter = '+' + latter
 
         if code == '+':
-            result = former + latter
+            output = former + latter
 
         else:
-            result = former + latter.replace('+','/').replace('-','+').replace('/','-')
+            output = former + latter.replace('+','/').replace('-','+').replace('/','-')
 
-        return self.cleaner(result)
+        return self.cleaner(output)
 
-    def cleaner(exper):
-        exper = exper[0] + exper[1:].replace('+','/').replace('-','/-')
-        inventory = []
-        for data in exper.split('/'):
+    def cleaner(expr):
+        expr_devided = expr[0] + expr[1:].replace('+','/').replace('-','/-')#演算子ごとに'/'を付けるが先頭の'-'には'/'を付けない
+        clean_list = [Item]
+        for data in expr_devided.split('/'):
             current = Item(data)
-            identical = 0
-            if len(inventory) > 0:
-                for ct,comparison in enumerate(inventory):
-                    for ct_str in range(26):
-                        if current.alphabet_compose[ct_str] != comparison.alphabet_compose[ct_str]:
-                            break
-                    if ct_str == 25:
-                        inventory[ct].number += current.number
-                        identical = 1
-                        break
+            identical_compose = None
+            for clean_list_partition in enumerate(clean_list):
+                if clean_list_partition.alphabet_compose == current.alphabet_compose:
+                    clean_list_partition.number += current.number
+                    identical_compose = 'exited'
+                    break
+            if identical_compose == None:
+                clean_list_partition.append(current)
+        output = ''
+        for clean_list_partition in clean_list:
+            if clean_list_partition.number == 1:
+                add_compose = clean_list_partition.alphabet_compose
+            
+            elif clean_list_partition.number == -1:
+                add_compose = '-' + clean_list_partition.alphabet_compose
 
-            if identical == 0:
-                inventory.append(current)
+            elif clean_list_partition.number != 0:
+                add_compose = str( clean_list_partition.number ) + clean_list_partition.alphabet_compose
+            
+            if add_compose == '-':   #文字が何もなくて定数が-1だった時への対処
+                add_compose = '-1'
 
-        result = ''
-        for comparison in inventory:
-            if comparison.number > 0 :
-                result += '+'
-                if comparison.number != 1:
-                    result += str(comparison.number)
-            elif comparison.number != 0:
-                result += '-'
-                if comparison.number != -1:
-                    result += str( -1 * comparison.number)
-            else:
-                continue
+            elif add_compose[0] != '-' and len(output) > 0:
+                add_compose = '+' + add_compose
+            output += add_compose
 
-            for ct_str in range(26):
-                result += string.ascii_letters[ct_str]*comparison.alphabet_compose[ct_str]
-
-        if result[0] == '+':
-            result = result[1:]
-
-        return result
+        return output
+        
+data = input()
+data = Method.convert_to_rpn(Method,data)
+print(data)

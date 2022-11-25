@@ -10,14 +10,14 @@ class Method:
         return self.find_add_sub(self,expr) or self.find_mul(self,expr) or expr
 
     def find_extra_brackets(expr):
-        deep = 0
+        brackets_deep = 0
         for c in expr[:-1]:
             if c == '(':
-                deep += 1
+                brackets_deep += 1
             elif c == ')':
-                deep -= 1
+                brackets_deep -= 1
 
-            if deep == 0:
+            if brackets_deep == 0:
                 return False
 
         return True
@@ -27,13 +27,12 @@ class Method:
             return None
         output = []
         code_stack = []
-        # ２になると演算子挿入
-        code_insert_timing = 0
-        deep = 0
+        code_insert_timing = 0  #２になると演算子挿入
+        brackets_deep = 0
         st = 0
         for ct, c in enumerate(expr):
-            deep = self.measure_brackets_deep(deep,c)
-            if deep > 0:
+            brackets_deep = self.measure_brackets_deep(brackets_deep,c)
+            if brackets_deep > 0:
                 continue
 
             if c == '+' or c == '-':
@@ -82,32 +81,23 @@ class Method:
                     code_insert_timing = 1
         return output
 
-    def measure_brackets_deep(deep,c):
+    def measure_brackets_deep(brackets_deep,c):
         if c == '(':
-            deep += 1
+            brackets_deep += 1
         elif c == ')':
-            deep -= 1
-        return deep
+            brackets_deep -= 1
+        return brackets_deep
 
-        # 2桁以上の数値のデータをつなげる
-    def next_data(c,next_c):
-        result = True
-        if ( c.isdigit() or c == '-' )and next_c.isdigit():
-            result = False
-
-        return result
-
-
-#   list型をstr型に
-    def convert_to_str(self,list):
+    def convert_list_to_str(self,list):
         array = []
         for cell in list:
             if isinstance(cell, str):
                 array.append(cell)
             else:
-                array += self.convert_to_str(self,cell)
+                array += self.convert_list_to_str(self,cell)
 
         return array
 data = input()
 data = Method.convert_to_rpn(Method,data)
+data = Method.convert_list_to_str(Method,data)
 print(data)
