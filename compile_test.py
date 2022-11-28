@@ -64,7 +64,6 @@ class cal:
         return self.cleaner(output)
 
     def add_sub_cal(self,former,latter,code):
-
         if latter[0] != '-':
             latter = '+' + latter
 

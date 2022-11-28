@@ -97,7 +97,3 @@ class Method:
                 array += self.convert_list_to_str(self,cell)
 
         return array
-data = input()
-data = Method.convert_to_rpn(Method,data)
-data = Method.convert_list_to_str(Method,data)
-print(data)
