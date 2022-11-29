@@ -19,7 +19,6 @@ class Method:
 
             if brackets_deep == 0:
                 return False
-
         return True
 
     def find_add_sub(self,expr):
@@ -27,7 +26,7 @@ class Method:
             return None
         output = []
         code_stack = []
-        code_insert_timing = 0  #２になると演算子挿入
+        code_insert_timing = 0  #'*'を挿入するタイミングを管理する
         brackets_deep = 0
         st = 0
         for ct, c in enumerate(expr):
@@ -56,8 +55,7 @@ class Method:
         if len(expr) < 2 or expr.isdigit():
             return None
         output = []
-        # ２になると演算子挿入
-        code_insert_timing = 0
+        code_insert_timing = 0  # ２になると演算子挿入
         deep = 0
         st = 0
         for ct, c in enumerate(expr):
@@ -76,7 +74,7 @@ class Method:
                     code_insert_timing += 1
                     st = ct + 1
             
-                if( code_insert_timing > 1 ):
+                if( code_insert_timing == 2 ):
                     output.append('*')
                     code_insert_timing = 1
         return output

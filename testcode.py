@@ -1,4 +1,5 @@
-from compile_test import cal
+from compile_test import Item,cal
+from rpm_test import Method
 
 class test_item:
     def test_mul():
@@ -19,15 +20,22 @@ class test_item:
         cleaned = cal.cleaner(expr)
         print(cleaned)
 
+    def test_entire():
+        rpm = Method.convert_to_rpn(Method,input())
+        print(rpm)
+        compile = cal.compile(cal,rpm)
+        print(compile)
+
 print("Please choose test item mul or add or clean")
 data = input()
-if data == "mul":
+if data == "m":
     test_item.test_mul()
 
-elif data == "add":
+elif data == "a":
     test_item.test_add_sub_cal()
 
-elif data == "clean":
+elif data == "c":
     test_item.test_cleaner()
 
- 
+elif data == "e":
+    test_item.test_entire()
