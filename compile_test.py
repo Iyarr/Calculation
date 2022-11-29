@@ -1,6 +1,3 @@
-import string
-import re
-from rpm_test import Method
 class Item:     #項の中身(名前、項)
     def __init__(self,item):
         self.number = 1
